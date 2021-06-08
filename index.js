@@ -3,6 +3,7 @@
 // };
 
 const path = require('path');
+const fs = require('fs')
 
 // Enviar Parámetros desde la terminal (Node)
 const param1 = process.argv[0]; // PARA CAPTURAR NODE
