@@ -7,6 +7,9 @@ const fs = require('fs');
 const MarkdownIt = require('markdown-it');
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
+var http = require('http');
+var https = require('https');
+const { resolve } = require('path');
 
 // Enviar Parámetros desde la terminal (Node)
 const param1 = process.argv[0]; // PARA CAPTURAR NODE
@@ -51,29 +54,57 @@ function readFileContent(arraydir) {
   const md = new MarkdownIt();
   let result;
   const dataLinks = [];
-
   arraydir.forEach(file => {
-    fs.readFile(file, 'utf8', (err, data) => {
-      if (err) {
-        throw err;
+    const data = fs.readFileSync(file, { encoding: 'utf8' })
+    result = md.render(data);
+    const dom = new JSDOM(result);
+    let Nodelinks = dom.window.document.querySelectorAll("a");
+    Nodelinks.forEach((link) => {
+      if (link.href.startsWith("http")) {
+        dataLinks.push({
+          href: link.href,
+          text: link.textContent,
+          file: file,
+        })
+        // return dataLinks
       }
-      result = md.render(data);
-      const dom = new JSDOM(result);
-      let Nodelinks = dom.window.document.querySelectorAll("a");
-      Nodelinks.forEach((link) => {
-        if (link.href.startsWith("http")) {
-          dataLinks.push({
-            href: link.href,
-            text: link.textContent,
-            file: file,
-          })
-        }
-      })
-      console.log(dataLinks)
-    }
-    );
+    })
   });
   return dataLinks;
 }
+
 const fileContent = readFileContent(arraydir2)
-// console.log("soy lectura de archivo", readFileCont))
+// console.log("soy lectura de archivo", fileContent)
+
+function validateStatusLinks(fileContent) {
+  const newArrObj = [];
+  fileContent.forEach((link) => {
+    if (link.href.startsWith('https')) {
+      const httpsGet = new Promise(function(resolver, rechazar){
+        https.get(link.href, function (res) {
+          const newObj = {
+            href: link.href,
+            text: link.text,
+            file: link.file,
+            status: res.statusCode,
+            ok: res.statusMessage,
+          }
+          res.on('error', function (e) {
+            console.error(e);
+          });
+          // console.log(newObj)
+          resolver (newObj);
+        })
+      });
+      newArrObj.push(httpsGet)
+    }
+  });
+  return Promise.all(newArrObj);
+  
+}
+
+validateStatusLinks(fileContent).then((resul) => {
+  console.log(resul)
+})
+
+
