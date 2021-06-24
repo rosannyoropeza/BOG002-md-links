@@ -2,7 +2,17 @@
   "name": "md-links",
   "version": "0.1.0",
   "dependencies": {
+    "chalk": "^4.1.1",
+    "eslint": "^7.10.0",
+    "jest": "^27.0.4",
     "jsdom": "^16.6.0",
     "markdown-it": "^12.0.6"
+  },
+  "scripts": {
+    "eslint": "eslint --ext .js src/ test/",
+    "test": "jest --coverage"
+  },
+  "bin": {
+    "mdLinks": "index.js"
   }
 }
