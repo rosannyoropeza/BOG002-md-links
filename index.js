@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-// const mdLinks = require("./md-Links");
+
 const path = require('path');
 const chalk = require('chalk');
-const mdLinks = require("./duplicate");
+const mdLinks = require("./md-Links");
 
 let pathFile = process.argv[2]; // PARA 1ER PARAMETRO
 let validate = false;
@@ -28,8 +28,7 @@ options = {
   'help': help,
 }
 
-if (help)
-{
+if (help) {
   //MUESTRAR TABLA INFORMATIVA
   const helps = {
     "--validate": "Muestra los links validados",
@@ -38,11 +37,10 @@ if (help)
   }
 
   console.table(helps);
-} 
-else 
-{
-  if (stats && validate) 
-  {
+  console.log(chalk.yellow('Indicaciones : Al ingresar la Ruta asegurese que sea valida y que este dentro de comillas. Ejemplo: "README.md", "C:\\Users\\romar\\OneDrive\\Documents\\Carpeta de Prueba de directorio".'));
+}
+else {
+  if (stats && validate) {
     //MOSTRAR ESTADISTICAS Y VALIDACION 
     mdLinks.main(pathFile, { validate: true }).then((res) => {
       //TOTAL
@@ -55,53 +53,47 @@ else
 
       //ROTOS
       const arrayLinkStatus =  res.map((link) => { return link.ok })
-      console.log("soy fail", arrayLinkStatus)
       const linksRotos =  arrayLinkStatus.filter((link) => { 
         if(link === 'Fail')
        return link;
       });
       console.log("Broken: ", linksRotos.length);
     });
-  } 
-  else 
-  {
-    if (stats) 
-    {
-      //MOSTRAR ESTADISTICAS 
-      mdLinks.main(pathFile, { validate: true }).then((res) => {
-        //TOTAL
-        console.log("Total: ", res.length);
-
-        //UNICOS
-        const arrayLinks =  res.map((link) => { return link.href });
-        const linksUnicos =  arrayLinks.filter((link, index, array) => { return array.indexOf(link) === index; });
-        console.log("Unique: ", linksUnicos.length);
-      });
-    } 
-    else 
-    {
-      //LINKS VALIDADOS
-      if (validate)
-      {
-        mdLinks.main(pathFile, { validate: true }).then((res) => {
-          res.forEach(link => {
-            const fileName = path.parse(link.file);
-            console.log(chalk.blue(fileName.base), chalk.green(link.href), chalk.yellow(link.status), chalk.red(link.ok), chalk.magenta(link.text));
-          });
-        });
-      }
-      else 
-      {
-        //LINKS SIN VALIDAR
-        mdLinks.main(pathFile, options).then((res) => {
-          res.forEach(link => {
-            const fileName = path.parse(link.file);
-            console.log(chalk.blue(fileName.base), chalk.green(link.href), chalk.magenta(link.text));
-          });
-        });
-      }
-    }
-
   }
+  else {
+        if(stats) {
+          //MOSTRAR ESTADISTICAS 
+          mdLinks.main(pathFile, { validate: true }).then((res) => {
+            //TOTAL
+            console.log("Total: ", res.length);
+
+            //UNICOS
+            const arrayLinks = res.map((link) => { return link.href });
+            const linksUnicos = arrayLinks.filter((link, index, array) => { return array.indexOf(link) === index; });
+            console.log("Unique: ", linksUnicos.length);
+          });
+        }
+    else {
+          //LINKS VALIDADOS
+          if(validate) {
+            mdLinks.main(pathFile, { validate: true }).then((res) => {
+              res.forEach(link => {
+                const fileName = path.parse(link.file);
+                console.log(chalk.blue(fileName.base), chalk.green(link.href), chalk.yellow(link.status), chalk.red(link.ok), chalk.magenta(link.text));
+              });
+            });
+          }
+      else {
+            //LINKS SIN VALIDAR
+            mdLinks.main(pathFile, options).then((res) => {
+              res.forEach(link => {
+                const fileName = path.parse(link.file);
+                console.log(chalk.blue(fileName.base), chalk.green(link.href), chalk.magenta(link.text));
+              });
+            });
+          }
+        }
+
+      }
 }
 
