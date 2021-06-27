@@ -3,9 +3,9 @@
 ## Índice
 
 * [1. ¿De que se trata la Libreria?](#1-Libreria)
-* [2. Documentación técnica de la librería](#2-Documentación técnica de la librería)
-* [3. Guía de uso e instalación de la librería](#3-Guía de uso e instalación de la librería)
-* [4. Guía de uso de la librería](#4-Guía de uso de la librería)
+* [2. Documentación técnica de la librería](#2-Documentación_técnica)
+* [3. Guía de uso e instalación de la librería](#3-Guía_de_uso_e_instalación_de_la_librería)
+* [4. Guía de uso de la librería](#4-Guía_de_uso_de_la_librería)
 
 ***
 ## 1. ¿De que se trata la Libreria?
