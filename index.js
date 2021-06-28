@@ -30,70 +30,81 @@ options = {
 
 if (help) {
   //MUESTRAR TABLA INFORMATIVA
-  const helps = {
-    "--validate": "Muestra los links validados",
-    "--stats": "Muestra el total de links y cuantos son únicos",
-    "--stats --validate": "Valida los links y muestra las estadística"
-  }
-
-  console.table(helps);
-  console.log(chalk.yellow('Indicaciones : Al ingresar la Ruta asegurese que sea valida y que este dentro de comillas. Ejemplo: "README.md", "C:\\Users\\romar\\OneDrive\\Documents\\Carpeta de Prueba de directorio".'));
+  const helps = `
+  ┌────────────────────┬──────────────────────────────────────────────────┐
+  │      "file.md"     │ 'Archivo markdown a enviar por parámetro'        │
+  │    --validate      │          'Muestra los links validados'           │
+  │      --stats       │ 'Muestra el total de links y cuántos son únicos' │
+  │ --stats --validate │   'Valida los links y muestra las estadística'   │
+  └────────────────────┴──────────────────────────────────────────────────┘
+`;
+  console.log(chalk.greenBright(helps));
+  console.log(chalk.white('INDICACIONES: Al ingresar la ruta asegúrese que sea válida y que esté dentro de comillas.'));
+  console.log(chalk.white('Ejemplo: "README.md", "C:\\Users\\romar\\OneDrive\\Documents\\Carpeta de Prueba de directorio".'));
 }
 else {
   if (stats && validate) {
     //MOSTRAR ESTADISTICAS Y VALIDACION 
     mdLinks.main(pathFile, { validate: true }).then((res) => {
       //TOTAL
-      console.log("Total: ", res.length)
+      const total = res.length;
 
       //UNICOS
-      const arrayLinks =  res.map((link) => { return link.href } )
-      const linksUnicos =  arrayLinks.filter((link, index, array) => { return array.indexOf(link) === index; } )
-      console.log("Unique: ", linksUnicos.length)
+      const arrayLinks = res.map((link) => { return link.href })
+      const linksUnicos = arrayLinks.filter((link, index, array) => { return array.indexOf(link) === index; })
+      const unicos = linksUnicos.length;
 
-      //ROTOS
-      const arrayLinkStatus =  res.map((link) => { return link.ok })
-      const linksRotos =  arrayLinkStatus.filter((link) => { 
-        if(link === 'Fail')
-       return link;
-      });
-      console.log("Broken: ", linksRotos.length);
+      ////ROTOS
+      const arrayLinkStatus = res.map((link) => { return link.ok })
+      const linksRotos = arrayLinkStatus.filter((link, index, array) => { return array.indexOf(link) === index; })
+      const rotos = linksRotos.length;
+
+      console.table({ Total: total, Unique: unicos, Broken: rotos});
     });
   }
   else {
-        if(stats) {
-          //MOSTRAR ESTADISTICAS 
-          mdLinks.main(pathFile, { validate: true }).then((res) => {
-            //TOTAL
-            console.log("Total: ", res.length);
+    if (stats) {
+      //MOSTRAR ESTADISTICAS 
+      mdLinks.main(pathFile, { validate: true }).then((res) => {
+        //TOTAL
+        const total = res.length;
 
-            //UNICOS
-            const arrayLinks = res.map((link) => { return link.href });
-            const linksUnicos = arrayLinks.filter((link, index, array) => { return array.indexOf(link) === index; });
-            console.log("Unique: ", linksUnicos.length);
-          });
-        }
+        //UNICOS
+        const arrayLinks = res.map((link) => { return link.href });
+        const linksUnicos = arrayLinks.filter((link, index, array) => { return array.indexOf(link) === index; });
+        const unicos = linksUnicos.length;
+
+        console.table({ Total: total, Unique: unicos });
+      });
+    }
     else {
-          //LINKS VALIDADOS
-          if(validate) {
-            mdLinks.main(pathFile, { validate: true }).then((res) => {
-              res.forEach(link => {
-                const fileName = path.parse(link.file);
-                console.log(chalk.blue(fileName.base), chalk.green(link.href), chalk.yellow(link.status), chalk.red(link.ok), chalk.magenta(link.text));
-              });
-            });
-          }
-      else {
-            //LINKS SIN VALIDAR
-            mdLinks.main(pathFile, options).then((res) => {
-              res.forEach(link => {
-                const fileName = path.parse(link.file);
-                console.log(chalk.blue(fileName.base), chalk.green(link.href), chalk.magenta(link.text));
-              });
-            });
-          }
-        }
-
+      //LINKS VALIDADOS
+      if (validate) {
+        mdLinks.main(pathFile, { validate: true }).then((res) => {
+          let linksValidate = [];
+          res.forEach(link => {
+            const fileName = path.parse(link.file);
+            linksValidate.push({
+              File: fileName.base,
+              Href: link.href.slice(0, 30),
+              Ok: link.ok,
+              Status: link.status,
+              Text: link.text.slice(0, 50)
+            })
+          })
+          console.table(linksValidate);
+        });
       }
-}
+      else {
+        //LINKS SIN VALIDAR
+        mdLinks.main(pathFile, options).then((res) => {
+          res.forEach(link => {
+            //const fileName = path.parse(link.file);
+            console.log(chalk.cyan(link.file.substr(50, 50)), chalk.greenBright(link.href.substr(0, 30)), chalk.magenta(link.text.substr(0, 50)));
+          });
+        });
+      }
+    }
 
+  }
+}
