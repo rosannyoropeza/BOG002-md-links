@@ -17,20 +17,39 @@ Con esta librería podras extraer archivos **markdown(.md)** para validar los li
 
 ## 3. Instalación de la librería
 
-`npm install`
+```sh
+npm install
+```
 
 ## 3. Guía de uso de la librería
 
-mdLinks recibe dos parámetros, el primero es una **ruta** que puede ser (absoluta/relativa) o  un **directorio** que contenga archivo(s) con extension **".md"**, y como segundo parámetro las **opciones** para: validar links, obtener las estadicticas, y ver la sección de ayuda. 
+La librería ***mdLinks*** recibe dos parámetros, el primero es una **ruta** que puede ser (absoluta/relativa) o  un **directorio** que contenga archivo(s) con extension **".md"**, y como segundo parámetro las **opciones** para: validar links, obtener las estadicticas, y ver la sección de ayuda. 
 
-Ejemplo : `mdLinks <path-to-file> [options]`
+Ejemplo : 
+```sh 
+mdLinks <path-to-file> [options]
+```
 
 Una vez instalada la librería debe ingresar el siguiente comando de código para importarlo en su proyecto:
 
-`const mdLinks = require('mdLinks')`
+```sh 
+const mdLinks = require('mdLinks')
+```
 
 #### Para las opciones (options):
 
+El comportamiento por defecto no validar las URLs, solo identifica el archivo markdown (a partir de la ruta que recibe como argumento), analiza el archivo Markdown e imprimir los links que vaya encontrando, junto con la ruta del archivo donde aparece y el texto que hay dentro del link (truncado a 50 caracteres).
+
+Por ejemplo:
+
+```sh
+$ mdLinks PRUEBA_TEST/dir_2/file2.md 
+file2.md https://www.youtube.com/watch? youtube
+file2.md https://www.google.com/?hl=es google
+file2.md https://www.instagram.com/?hl= instagram
+file2.md https://www.spotify.com/ spotify
+file2.md https://twitter.com/?lang=es twitter
+```
 ##### `--validate`
 
 Si introduce la opción `--validate`, la libreria realiza una petición HTTP para
@@ -39,28 +58,16 @@ averiguar si el link funciona o no.
 Por ejemplo:
 
 ```sh
-romar@DESKTOP-K5FMT1M MINGW64 ~/OneDrive/Documents/BOG002-md-links (main)
-$ mdLinks PRUEBA_TEST --validate
-file1.md https://es.wikipedia.org/wiki/Markdown 200 OK Markdown
-file1.md https://nodejs.org/es/ 200 OK Node.js
-file1.md https://nodejs.orooog/api/fs.html Este Link no existe Fail fs
-file1.md https://www.npmjbbbs.com/ Este Link no existe Fail npm
-file1.md https://jestjs.io/docs/es-ES/manual-mocks 301 OK Uso de librerias de Mock.
-file1.md https://es.wikipedia.org/wiki/Markdown 200 OK Markdown
-file1.md https://nodejs.org/es/ 200 OK Node.js
-file1.md https://nodejs.orooog/api/fs.html Este Link no existe Fail fs
-file1.md https://www.npmjbbbs.com/ Este Link no existe Fail npm
-file1.md https://jestjs.io/docs/es-ES/manual-mocks 301 OK Uso de librerias de Mock.
-file2.md https://www.youtube.com/watch?v=VENMwSF15WU&t=4939s 200 OK youtube
-file2.md https://www.google.com/?hl=es 200 OK google
-file2.md https://www.instagram.com/?hl=es-la 200 OK instagram
-file2.md https://www.spotify.com/ 301 OK spotify
-file2.md https://twitter.com/?lang=es 200 OK twitter
-file3.md https://www.espn.com/ 200 OK espn
-file3.md https://www.directvsports.com/ 200 OK directvsports
-file3.md https://www.foxsports.com/ 200 OK foxsports
-file3.md https://www.realmadrid.com/ 200 OK realmadrid
-file3.md https://www.winsports.co/ 200 OK winsports
+$ mdLinks PRUEBA_TEST/dir_2/file2.md --validate
+┌─────────┬────────────┬──────────────────────────────────┬──────┬────────┬─────────────┐
+│ (index) │    File    │               Href               │  Ok  │ Status │    Text     │
+├─────────┼────────────┼──────────────────────────────────┼──────┼────────┼─────────────┤
+│    0    │ 'file2.md' │ 'https://www.youtube.com/watch?' │ 'OK' │  200   │  'youtube'  │
+│    1    │ 'file2.md' │ 'https://www.google.com/?hl=es'  │ 'OK' │  200   │  'google'   │
+│    2    │ 'file2.md' │ 'https://www.instagram.com/?hl=' │ 'OK' │  200   │ 'instagram' │
+│    3    │ 'file2.md' │    'https://www.spotify.com/'    │ 'OK' │  301   │  'spotify'  │
+│    4    │ 'file2.md' │  'https://twitter.com/?lang=es'  │ 'OK' │  200   │  'twitter'  │
+└─────────┴────────────┴──────────────────────────────────┴──────┴────────┴─────────────┘
 ```
 
 Vemos que el _output_ en este caso incluye la palabra `ok` o `fail` después de
@@ -73,21 +80,27 @@ Si introduce la opción `--stats` el output (salida) será un texto con estadís
 básicas sobre los links.
 
 ```sh
-romar@DESKTOP-K5FMT1M MINGW64 ~/OneDrive/Documents/BOG002-md-links (main)
-$ mdLinks PRUEBA_TEST --stats
-Total:  20
-Unique:  15
+$ mdLinks PRUEBA_TEST/dir_1/file1.md --stats
+┌─────────┬────────┐
+│ (index) │ Values │
+├─────────┼────────┤
+│  Total  │   10   │
+│ Unique  │   5    │
+└─────────┴────────┘
 ```
 
 También se puede combinar `--stats` y `--validate` para obtener estadísticas que
 necesiten de los resultados de la validación.
 
 ```sh
-romar@DESKTOP-K5FMT1M MINGW64 ~/OneDrive/Documents/BOG002-md-links (main)
-$ mdLinks PRUEBA_TEST --stats --validate
-Total:  20
-Unique:  15
-Broken:  2 
+$ mdLinks PRUEBA_TEST/dir_1/file1.md --stats --validate
+┌─────────┬────────┐
+│ (index) │ Values │
+├─────────┼────────┤
+│  Total  │   10   │
+│ Unique  │   5    │
+│ Broken  │   2    │
+└─────────┴────────┘
 ```
 
 ##### `--help`
@@ -95,15 +108,16 @@ Broken:  2
 Al ingresar `--help` muestra cuales son las opciones y que resuelve cada uno.
 
 ```sh
-romar@DESKTOP-K5FMT1M MINGW64 ~/OneDrive/Documents/BOG002-md-links (main)
-$ mdLinks PRUEBA_TEST --help
-┌────────────────────┬──────────────────────────────────────────────────┐
-│      (index)       │                      Values                      │
-├────────────────────┼──────────────────────────────────────────────────┤
-│     --validate     │          'Muestra los links validados'           │
-│      --stats       │ 'Muestra el total de links y cuántos son únicos' │
-│ --stats --validate │   'Valida los links y muestra las estadística'   │
-└────────────────────┴──────────────────────────────────────────────────┘
-Indicaciones : Al ingresar la ruta asegúrese que sea válida y que esté dentro de comillas. Ejemplo: "README.md", "C:\Users\romar\OneDrive\Documents\Carpeta de Prueba de directorio".
+$ mdLinks PRUEBA_TEST/dir_1/file1.md --help
+
+  ┌────────────────────┬──────────────────────────────────────────────────┐
+  │      "file.md"     │ 'Archivo markdown a enviar por parámetro'        │
+  │    --validate      │          'Muestra los links validados'           │
+  │      --stats       │ 'Muestra el total de links y cuántos son únicos' │
+  │ --stats --validate │   'Valida los links y muestra las estadística'   │
+  └────────────────────┴──────────────────────────────────────────────────┘
+
+INDICACIONES: Al ingresar la ruta asegúrese que sea válida y que esté dentro de comillas.
+Ejemplo: "README.md", "C:\Users\romar\OneDrive\Documents\Carpeta de Prueba de directorio".
 ```
 
