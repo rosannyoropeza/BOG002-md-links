@@ -2,43 +2,52 @@
 
 ## Índice
 
-* [1. ¿De que se trata la Libreria?](#1-Libreria)
-* [2. Documentación técnica de la librería](#2-Documentación_técnica)
-* [3. Guía de uso e instalación de la librería](#3-Guía_de_uso_e_instalación_de_la_librería)
-* [4. Guía de uso de la librería](#4-Guía_de_uso_de_la_librería)
+* [1. Documentación técnica de la librería](#2-Documentación_técnica)
+* [2. Guía de uso e instalación de la librería](#3-Guía_de_uso_e_instalación_de_la_librería)
 
 ***
-## 1. ¿De que se trata la Libreria?
+## 1. Documentación técnica de la librería
 
-Con esta librería podras extraer archivos **markdown(.md)** para validar los links que estos contenga y mostrar como resultado la cantidad total de links, así como los links rotos y únicos.
+Con ***mdLinks*** podras extraer los links que contengan los archivos **markdown(.md)** para validarlos y obtener como resultado la cantidad total de links, total rotos y total únicos.
 
-## 2. Documentación técnica de la librería
+La librería ***mdLinks*** recibe dos parámetros, el primero es una **ruta** que puede ser (absoluta o relativa), también puede introducir un **directorio** que contenga archivo(s) con extensión **".md"**, y como segundo parámetro las **opciones** para: validar links, obtener las estadísticas, y ver la sección de ayuda. 
+
+La función retornar una promesa (Promise) que resuelve un arreglo (Array) de objetos (Object), donde cada objeto representa un link y contiene las siguientes propiedades:
+
+Con validate:false :
+
+href: URL encontrada.
+text: Texto que aparecía dentro del link (<a>).
+file: Ruta del archivo donde se encontró el link.
 
 
-## 3. Instalación de la librería
+Con validate:true :
+
+href: URL encontrada.
+text: Texto que aparecía dentro del link (<a>).
+file: Ruta del archivo donde se encontró el link.
+status: Código de respuesta HTTP.
+ok: Mensaje fail en caso de fallo u ok en caso de éxito.
+
+
+## 2. Guía de uso e instalación de la librería
+
+Para instalar la librería debe ingresar la siguiente línea de comando en su proyecto:
 
 ```sh
 npm install
 ```
 
-## 3. Guía de uso de la librería
-
-La librería ***mdLinks*** recibe dos parámetros, el primero es una **ruta** que puede ser (absoluta/relativa) o  un **directorio** que contenga archivo(s) con extension **".md"**, y como segundo parámetro las **opciones** para: validar links, obtener las estadicticas, y ver la sección de ayuda. 
+Luego de realizar la intalación ingrese la ruta y las opciones en la consola, de la siguiente forma:
 
 Ejemplo : 
 ```sh 
 mdLinks <path-to-file> [options]
 ```
 
-Una vez instalada la librería debe ingresar el siguiente comando de código para importarlo en su proyecto:
-
-```sh 
-const mdLinks = require('mdLinks')
-```
-
 #### Para las opciones (options):
 
-El comportamiento por defecto no validar las URLs, solo identifica el archivo markdown (a partir de la ruta que recibe como argumento), analiza el archivo Markdown e imprimir los links que vaya encontrando, junto con la ruta del archivo donde aparece y el texto que hay dentro del link (truncado a 50 caracteres).
+El comportamiento por defecto no valida las URLs, solo identifica el archivo markdown (a partir de la ruta que recibe como argumento), analiza el archivo Markdown e imprimir los links que vaya encontrando, junto con la ruta del archivo donde aparece y el texto que hay dentro del link (truncado a 50 caracteres).
 
 Por ejemplo:
 
@@ -105,7 +114,7 @@ $ mdLinks PRUEBA_TEST/dir_1/file1.md --stats --validate
 
 ##### `--help`
 
-Al ingresar `--help` muestra cuales son las opciones y que resuelve cada uno.
+Al ingresar `--help` indicará los comandos que se pueden usar:
 
 ```sh
 $ mdLinks PRUEBA_TEST/dir_1/file1.md --help
@@ -120,4 +129,3 @@ $ mdLinks PRUEBA_TEST/dir_1/file1.md --help
 INDICACIONES: Al ingresar la ruta asegúrese que sea válida y que esté dentro de comillas.
 Ejemplo: "README.md", "C:\Users\romar\OneDrive\Documents\Carpeta de Prueba de directorio".
 ```
-
