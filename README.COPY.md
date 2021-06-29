@@ -12,7 +12,7 @@ Con ***mdLinks*** podras extraer los links que contengan los archivos **markdown
 
 La librería ***mdLinks*** recibe dos parámetros, el primero es una **ruta** que puede ser (absoluta o relativa), también puede introducir un **directorio** que contenga archivo(s) con extensión **".md"**, y como segundo parámetro las **opciones** para: validar links, obtener las estadísticas, y ver la sección de ayuda. 
 
-La función retornar una promesa (Promise) que resuelve un arreglo (Array) de objetos (Object), donde cada objeto representa un link y contiene las siguientes propiedades:
+La función retorna una promesa (Promise) que resuelve un arreglo (Array) de objetos (Object), donde cada objeto representa un link y contiene las siguientes propiedades:
 
 ```sh
 Con validate : false :
@@ -29,6 +29,30 @@ text: Texto que aparecía dentro del link (<a>).
 file: Ruta del archivo donde se encontró el link.
 status: Código de respuesta HTTP.
 ok: Mensaje fail en caso de fallo u ok en caso de éxito.
+```
+
+#### Ejemplo (resultados como comentarios)
+
+```js
+const mdLinks = require("md-links");
+
+mdLinks("./some/example.md")
+  .then(links => {
+    // => [{ href, text, file }, ...]
+  })
+  .catch(console.error);
+
+mdLinks("./some/example.md", { validate: true })
+  .then(links => {
+    // => [{ href, text, file, status, ok }, ...]
+  })
+  .catch(console.error);
+
+mdLinks("./some/dir")
+  .then(links => {
+    // => [{ href, text, file }, ...]
+  })
+  .catch(console.error);
 ```
 
 ## 2. Guía de uso e instalación de la librería
