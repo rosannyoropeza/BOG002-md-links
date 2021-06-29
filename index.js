@@ -59,7 +59,9 @@ else {
       const linksRotos = arrayLinkStatus.filter((link, index, array) => { return array.indexOf(link) === index; })
       const rotos = linksRotos.length;
 
-      console.table({ Total: total, Unique: unicos, Broken: rotos});
+      console.table({ Total: total, Unique: unicos, Broken: rotos });
+    }).catch((err) => {
+      console.log(chalk.red(err));
     });
   }
   else {
@@ -75,6 +77,8 @@ else {
         const unicos = linksUnicos.length;
 
         console.table({ Total: total, Unique: unicos });
+      }).catch((err) => {
+        console.log(chalk.red(err));
       });
     }
     else {
@@ -93,6 +97,8 @@ else {
             })
           })
           console.table(linksValidate);
+        }).catch((err) => {
+          console.log(chalk.red(err));
         });
       }
       else {
@@ -102,9 +108,10 @@ else {
             //const fileName = path.parse(link.file);
             console.log(chalk.cyan(link.file.substr(50, 50)), chalk.greenBright(link.href.substr(0, 30)), chalk.magenta(link.text.substr(0, 50)));
           });
+        }).catch((err) => {
+          console.log(chalk.red(err));
         });
       }
     }
-
   }
 }
