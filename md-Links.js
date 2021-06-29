@@ -5,7 +5,6 @@ const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const http = require('http');
 const https = require('https');
-const chalk = require('chalk');
 
 const mdLinks = {
 
@@ -36,50 +35,46 @@ const mdLinks = {
     readFileContent: function (arraydir) {
         const md = new MarkdownIt();
         let result;
-        const dataLinks = [];
+        let dataLinks = {};
+        const arrDataLinks = [];
         arraydir.forEach(file => {
-            const fileReading = new Promise(function (resolver) {
+            const fileReading = new Promise(function (resolver, rechazar) {
+
                 const data = fs.readFileSync(file, { encoding: 'utf8' })
                 result = md.render(data);
                 const dom = new JSDOM(result);
                 let Nodelinks = dom.window.document.querySelectorAll("a");
                 Nodelinks.forEach((link) => {
-                    if (link.href.startsWith("http")) {
-                        dataLinks.push({
-                            href: link.href,
-                            text: link.textContent,
-                            file: file,
-                        })
+                    dataLinks = {
+                        href: link.href,
+                        text: link.textContent,
+                        file: file,
                     }
+                    arrDataLinks.push(dataLinks)
+                    resolver(arrDataLinks);
                 })
-                resolver(dataLinks);
             });
+
         });
-        return Promise.all(dataLinks);
+        return Promise.all(arrDataLinks);
     },
 
-    // Para realizar petición http 
+    // Para realizar petición http
     validateStatusLinks: function (fileContent) {
         const newArrObj = [];
         fileContent.forEach((link) => {
-            if (link.href.startsWith('https')) {
+            if (link.href.startsWith('http')) {
+                let objRequest = http;
                 const myURL = new URL(link.href);
-                let objRequest = "";
-                if (myURL.protocol === 'http') {
-                    objRequest = http;
-                }
-                else {
+                if (myURL.protocol === 'https:') {
                     objRequest = https;
                 }
                 const httpsGet = new Promise(function (resolver) {
                     objRequest.get(link.href, function (res) {
                         res.on('data', () => {
-                            let message = '';
+                            let message = 'Fail';
                             if (res.statusCode >= 200 && res.statusCode <= 399) {
                                 message = 'OK';
-                            }
-                            else {
-                                message = 'Fail';
                             }
                             const newObj = {
                                 href: link.href,
@@ -90,23 +85,20 @@ const mdLinks = {
                             }
                             resolver(newObj);
                         });
-
                         // Toda la respuesta ha sido recibida. Imprimir el resultado.
-                        res.on('end', () => {
-                            resolver(link)
-                        });
-
-                    })
-                        .on('error', function (e) {
-                            const newObj = {
-                                href: link.href,
-                                text: link.text,
-                                file: link.file,
-                                status: 'Este Link no existe',
-                                ok: 'Fail'
-                            }
-                            resolver(newObj);
-                        });
+                        // res.on('end', (newObj) => {
+                        //     resolver(newObj)
+                        // });
+                    }).on('error', function (e) {
+                        const newObj = {
+                            href: link.href,
+                            text: link.text,
+                            file: link.file,
+                            status: 'Este Link no existe',
+                            ok: 'Fail'
+                        }
+                        resolver(newObj);
+                    });
                 });
                 newArrObj.push(httpsGet);
             }
@@ -115,22 +107,23 @@ const mdLinks = {
     },
 
     main: function (pathFile, options) {
-        // Convirtiendo una ruta relativa a ruta absoluta
         return new Promise(function (resolver, rechazar) {
-
+            
+            // Verificando si la ruta existe
             if (!fs.existsSync(pathFile)) {
-                // throw Error("El archivo ¡NO EXISTE!");
-                console.log(chalk.red("El archivo ¡NO EXISTE!"));
-                console.log(chalk.yellow('RECUERDE : El path debe ser un string.'));
-                return
+                rechazar("El archivo ¡NO EXISTE!");
             }
-
+            
+            // Convirtiendo una ruta relativa a ruta absoluta
             if (path.isAbsolute(pathFile) === false) {
                 pathFile = path.resolve(pathFile);
             }
 
             const files = mdLinks.getFiles(pathFile);
             mdLinks.readFileContent(files).then((arrayDir) => {
+                if (arrayDir.length === 0) {
+                    rechazar("El archivo ¡No contiene Links!");
+                }
                 if (options.validate === true) {
                     mdLinks.validateStatusLinks(arrayDir).then((fileContent) => {
                         resolver(fileContent);
@@ -140,7 +133,7 @@ const mdLinks = {
                     resolver(arrayDir);
                 }
             }).catch((error) => {
-                console.log(error)
+                rechazar("Error desconocido:" + error);
             });
         });
     }
